@@ -5,16 +5,19 @@ static void print_hello(GtkWidget *widget, gpointer data) {
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
+  GtkBuilder *build;
   GtkWidget *window;
   GtkWidget *button;
 
-  window = gtk_application_window_new(app);
-  gtk_window_set_title(GTK_WINDOW(window), "Foobar");
-  gtk_window_set_default_size(GTK_WINDOW(window), 200, 200);
+  build = gtk_builder_new_from_resource("/net/catech-software/climate-tracker/climate-tracker.ui");
 
-  button = gtk_button_new_with_label("Click Me");
+  window = GTK_WIDGET(gtk_builder_get_object(build, "window"));
+  gtk_window_set_application(GTK_WINDOW(window), app);
+
+  button = GTK_WIDGET(gtk_builder_get_object(build, "button"));
   g_signal_connect(button, "clicked", G_CALLBACK(print_hello), NULL);
-  gtk_window_set_child(GTK_WINDOW(window), button);
+
+  g_object_unref(build);
 
   gtk_window_present(GTK_WINDOW(window));
 }
