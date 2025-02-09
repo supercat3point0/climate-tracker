@@ -1,21 +1,18 @@
+#include <stdlib.h>
 #include <gtk/gtk.h>
 
-static void print_hello(GtkWidget *widget, gpointer data) {
-  g_print("Hello, World!\n");
+G_MODULE_EXPORT void print_hello(GtkButton *button) {
+  g_print("%s pressed\n", gtk_buildable_get_buildable_id(GTK_BUILDABLE(button)));
 }
 
-static void activate(GtkApplication *app, gpointer user_data) {
+static void activate(GtkApplication *app) {
   GtkBuilder *build;
-  GtkWidget *window;
-  GtkWidget *button;
+  GtkApplicationWindow *window;
 
   build = gtk_builder_new_from_resource("/net/catech-software/climate-tracker/climate-tracker.ui");
 
-  window = GTK_WIDGET(gtk_builder_get_object(build, "window"));
+  window = GTK_APPLICATION_WINDOW(gtk_builder_get_object(build, "window"));
   gtk_window_set_application(GTK_WINDOW(window), app);
-
-  button = GTK_WIDGET(gtk_builder_get_object(build, "button"));
-  g_signal_connect(button, "clicked", G_CALLBACK(print_hello), NULL);
 
   g_object_unref(build);
 
