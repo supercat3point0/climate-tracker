@@ -1,10 +1,6 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
-G_MODULE_EXPORT void print_hello(GtkButton *button) {
-  g_print("%s pressed\n", gtk_buildable_get_buildable_id(GTK_BUILDABLE(button)));
-}
-
 static void activate(GtkApplication *app) {
   GtkBuilder *build;
   GtkApplicationWindow *window;

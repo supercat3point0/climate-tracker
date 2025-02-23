@@ -4,52 +4,120 @@
   <requires lib="gtk" version="4.0" />
   <object class="GtkApplicationWindow" id="window">
     <property name="title">Climate Tracker</property>
-    <property name="default-width">320</property>
-    <property name="default-height">200</property>
     <child>
-      <object class="GtkGrid">
-        <property name="column-spacing">5</property>
-        <property name="row-spacing">5</property>
-        <property name="halign">GTK_ALIGN_CENTER</property>
-        <property name="valign">GTK_ALIGN_CENTER</property>
+      <object class="GtkBox">
+        <property name="spacing">5</property>
+        <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
         <child>
-          <object class="GtkButton" id="button-1">
-            <property name="label">Button 1</property>
-            <signal name="clicked" handler="print_hello" />
-            <layout>
-              <property name="column">0</property>
-              <property name="row">0</property>
-            </layout>
+          <object class="GtkBox">
+            <property name="spacing">2</property>
+            <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="label">Monthly electric bill (USD)</property>
+                <property name="xalign">0</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkEntry">
+                <property name="input-purpose">GTK_INPUT_PURPOSE_NUMBER</property>
+              </object>
+            </child>
           </object>
         </child>
         <child>
-          <object class="GtkButton" id="button-2">
-            <property name="label">Button 2</property>
-            <signal name="clicked" handler="print_hello" />
-            <layout>
-              <property name="column">1</property>
-              <property name="row">0</property>
-            </layout>
+          <object class="GtkBox">
+            <property name="spacing">2</property>
+            <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="label">Monthly gas bill (USD)</property>
+                <property name="xalign">0</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkEntry">
+                <property name="input-purpose">GTK_INPUT_PURPOSE_NUMBER</property>
+              </object>
+            </child>
           </object>
         </child>
         <child>
-          <object class="GtkButton" id="button-3">
-            <property name="label">Button 3</property>
-            <signal name="clicked" handler="print_hello" />
-            <layout>
-              <property name="column">0</property>
-              <property name="row">1</property>
-            </layout>
+          <object class="GtkBox">
+            <property name="spacing">2</property>
+            <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="label">Monthly oil bill (USD)</property>
+                <property name="xalign">0</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkEntry">
+                <property name="input-purpose">GTK_INPUT_PURPOSE_NUMBER</property>
+              </object>
+            </child>
           </object>
         </child>
         <child>
-          <object class="GtkButton" id="button-4">
-            <property name="label">Button 4</property>
-            <signal name="clicked" handler="print_hello" />
-            <layout>
-              <property name="column">1</property>
-              <property name="row">1</property>
-            </layout>
+          <object class="GtkBox">
+            <property name="spacing">2</property>
+            <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="label">Yearly mileage (mpg)</property>
+                <property name="xalign">0</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkEntry">
+                <property name="input-purpose">GTK_INPUT_PURPOSE_NUMBER</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="spacing">2</property>
+            <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="label">Yearly flights (&lt;4 hours)</property>
+                <property name="xalign">0</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkEntry">
+                <property name="input-purpose">GTK_INPUT_PURPOSE_NUMBER</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="spacing">2</property>
+            <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="label">Yearly flights (&gt;4 hours)</property>
+                <property name="xalign">0</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkEntry">
+                <property name="input-purpose">GTK_INPUT_PURPOSE_NUMBER</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkCheckButton">
+            <property name="label">Recycle newspaper</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkCheckButton">
+            <property name="label">Recycle aluminum and tin</property>
           </object>
         </child>
       </object>

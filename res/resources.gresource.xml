@@ -2,6 +2,6 @@
 <!DOCTYPE gresources>
 <gresources>
   <gresource prefix="/net/catech-software/climate-tracker">
-    <file>climate-tracker.ui</file>
+    <file preprocess="xml-stripblanks">climate-tracker.ui</file>
   </gresource>
 </gresources>
