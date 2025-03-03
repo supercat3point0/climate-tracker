@@ -8,30 +8,40 @@ static GtkBuilder *build;
 G_MODULE_EXPORT void calculate_footprint(void) {
   double footprint = 0;
 
+  // add 105lbs for every dollar spent on electricity
   GtkSpinButton *electric = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "electric"));
   footprint += gtk_spin_button_get_value(electric) * 105;
 
+  // add 105lbs for every dollar spent on gas
   GtkSpinButton *gas = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "gas"));
   footprint += gtk_spin_button_get_value(gas) * 105;
 
+  // add 113lbs for every dollar spent on oil
   GtkSpinButton *oil = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "oil"));
   footprint += gtk_spin_button_get_value(oil) * 113;
 
+  // add 0.79lbs for every mile driven
   GtkSpinButton *mileage = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "mileage"));
   footprint += gtk_spin_button_get_value(mileage) * 0.79;
 
+  // add 1100lbs for every flight less than 4 hours
   GtkSpinButton *flights = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "flights"));
   footprint += gtk_spin_button_get_value(flights) * 1100;
 
+  // add 4400lbs for every flight over 4 hours
   GtkSpinButton *flights4 = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "flights4"));
   footprint += gtk_spin_button_get_value(flights4) * 4400;
 
+  // add 184lbs if you don't recycle newspaper
   GtkCheckButton *newspaper = GTK_CHECK_BUTTON(gtk_builder_get_object(build, "newspaper"));
   if (!gtk_check_button_get_active(newspaper)) footprint += 184;
 
+  // add 166lbs if you don't recycle aluminum and tin
   GtkCheckButton *aluminum = GTK_CHECK_BUTTON(gtk_builder_get_object(build, "aluminum"));
   if (!gtk_check_button_get_active(aluminum)) footprint += 166;
 
+  // use snprintf to calculate the size of the formatted string
+  // use %g instead of %f so there aren't any trailing zeros
   char *str = malloc((snprintf(NULL, 0, "Carbon footprint: %glbs", footprint) + 1) * sizeof(char));
   sprintf(str, "Carbon footprint: %glbs", footprint);
   GtkLabel *label = GTK_LABEL(gtk_builder_get_object(build, "footprint"));
