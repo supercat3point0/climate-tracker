@@ -8,6 +8,10 @@
       <object class="GtkBox">
         <property name="spacing">5</property>
         <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+        <property name="margin-start">10</property>
+        <property name="margin-end">10</property>
+        <property name="margin-top">10</property>
+        <property name="margin-bottom">10</property>
         <child>
           <object class="GtkBox">
             <property name="spacing">2</property>
@@ -19,8 +23,17 @@
               </object>
             </child>
             <child>
-              <object class="GtkEntry">
-                <property name="input-purpose">GTK_INPUT_PURPOSE_NUMBER</property>
+              <object class="GtkSpinButton" id="electric">
+                <property name="climb-rate">1</property>
+                <property name="digits">2</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">1000000000</property>
+                    <property name="step-increment">1</property>
+                  </object>
+                </property>
+                <signal name="value-changed" handler="calculate_footprint" />
               </object>
             </child>
           </object>
@@ -36,8 +49,17 @@
               </object>
             </child>
             <child>
-              <object class="GtkEntry">
-                <property name="input-purpose">GTK_INPUT_PURPOSE_NUMBER</property>
+              <object class="GtkSpinButton" id="gas">
+                <property name="climb-rate">1</property>
+                <property name="digits">2</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">1000000000</property>
+                    <property name="step-increment">1</property>
+                  </object>
+                </property>
+                <signal name="value-changed" handler="calculate_footprint" />
               </object>
             </child>
           </object>
@@ -53,8 +75,17 @@
               </object>
             </child>
             <child>
-              <object class="GtkEntry">
-                <property name="input-purpose">GTK_INPUT_PURPOSE_NUMBER</property>
+              <object class="GtkSpinButton" id="oil">
+                <property name="climb-rate">1</property>
+                <property name="digits">2</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">1000000000</property>
+                    <property name="step-increment">1</property>
+                  </object>
+                </property>
+                <signal name="value-changed" handler="calculate_footprint" />
               </object>
             </child>
           </object>
@@ -65,13 +96,22 @@
             <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
             <child>
               <object class="GtkLabel">
-                <property name="label">Yearly mileage (mpg)</property>
+                <property name="label">Yearly mileage (mi/y)</property>
                 <property name="xalign">0</property>
               </object>
             </child>
             <child>
-              <object class="GtkEntry">
-                <property name="input-purpose">GTK_INPUT_PURPOSE_NUMBER</property>
+              <object class="GtkSpinButton" id="mileage">
+                <property name="climb-rate">1</property>
+                <property name="digits">0</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">1000000000</property>
+                    <property name="step-increment">1</property>
+                  </object>
+                </property>
+                <signal name="value-changed" handler="calculate_footprint" />
               </object>
             </child>
           </object>
@@ -87,8 +127,17 @@
               </object>
             </child>
             <child>
-              <object class="GtkEntry">
-                <property name="input-purpose">GTK_INPUT_PURPOSE_NUMBER</property>
+              <object class="GtkSpinButton" id="flights">
+                <property name="climb-rate">1</property>
+                <property name="digits">0</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">1000000000</property>
+                    <property name="step-increment">1</property>
+                  </object>
+                </property>
+                <signal name="value-changed" handler="calculate_footprint" />
               </object>
             </child>
           </object>
@@ -104,20 +153,42 @@
               </object>
             </child>
             <child>
-              <object class="GtkEntry">
-                <property name="input-purpose">GTK_INPUT_PURPOSE_NUMBER</property>
+              <object class="GtkSpinButton" id="flights4">
+                <property name="climb-rate">1</property>
+                <property name="digits">0</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">1000000000</property>
+                    <property name="step-increment">1</property>
+                  </object>
+                </property>
+                <signal name="value-changed" handler="calculate_footprint" />
               </object>
             </child>
           </object>
         </child>
         <child>
-          <object class="GtkCheckButton">
+          <object class="GtkCheckButton" id="newspaper">
             <property name="label">Recycle newspaper</property>
+            <signal name="toggled" handler="calculate_footprint" />
           </object>
         </child>
         <child>
-          <object class="GtkCheckButton">
+          <object class="GtkCheckButton" id="aluminum">
             <property name="label">Recycle aluminum and tin</property>
+            <signal name="toggled" handler="calculate_footprint" />
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel" id="footprint">
+            <property name="xalign">0</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="label">An ideal footprint is from 6000 to 16000lbs/year. 16000 to 22000lbs/year is average.</property>
+            <property name="xalign">0</property>
           </object>
         </child>
       </object>
