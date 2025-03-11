@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/stat.h>
 
+#include <glib.h>
 #include <gtk/gtk.h>
 
 static GtkBuilder *build;
@@ -58,15 +60,31 @@ static void activate(GtkApplication *app) {
   gtk_window_present(GTK_WINDOW(window));
 
   calculate_footprint();
+
+  const char *user_data_dir = g_get_user_data_dir();
+  const char *data_dir = "/net.catech_software.climate_tracker";
+  const char *file = "/file.txt";
+  char *path = malloc(strlen(user_data_dir) + strlen(data_dir) + strlen(file) + 1);
+  strcpy(path, user_data_dir);
+  strcat(path, data_dir);
+  mkdir(path, 0700);
+  strcat(path, file);
+  FILE *fp = fopen(path, "w");
+  free(path);
+  fprintf(fp, "Hello, World!\n");
+  fclose(fp);
+}
+
+static void shutdown(void) {
+  g_object_unref(build);
 }
 
 int main(int argc, char *argv[]) {
   GtkApplication *app = gtk_application_new("net.catech_software.climate_tracker", G_APPLICATION_DEFAULT_FLAGS);
   g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
+  g_signal_connect(app, "shutdown", G_CALLBACK(shutdown), NULL);
   int status = g_application_run(G_APPLICATION(app), argc, argv);
   g_object_unref(app);
-
-  g_object_unref(build);
 
   return status;
 }
