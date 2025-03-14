@@ -18,12 +18,31 @@ find_program(GLIB_COMPILE_RESOURCES glib-compile-resources REQUIRED)
 add_executable(climate-tracker)
 target_link_libraries(climate-tracker PRIVATE PkgConfig::GTK4)
 
+if (MSVC)
+  target_compile_options(climate-tracker PRIVATE "/Wall")
+  target_compile_options(climate-tracker PRIVATE "$<$<CONFIG:Debug>:/Zi>")
+  target_compile_options(climate-tracker PRIVATE "$<$<CONFIG:Release>:/O2;/DNDEBUG>")
+  target_compile_options(climate-tracker PRIVATE "$<$<CONFIG:RelWithDebInfo>:/Zi;/O2;/DNDEBUG>")
+  target_compile_options(climate-tracker PRIVATE "$<$<CONFIG:MinSizeRel>:/O1;/DNDEBUG>")
+  target_link_options(climate-tracker PRIVATE "/link" "/entry:main" "/subsystem:windows")
+else()
+  target_compile_options(climate-tracker PRIVATE "-Wall" "-Wextra" "-Wpedantic")
+  target_compile_options(climate-tracker PRIVATE "$<$<CONFIG:Debug>:-g3;-Og>")
+  target_compile_options(climate-tracker PRIVATE "$<$<CONFIG:Release>:-O2;-DNDEBUG>")
+  target_compile_options(climate-tracker PRIVATE "$<$<CONFIG:RelWithDebInfo>:-g3;-O2;-DNDEBUG>")
+  target_compile_options(climate-tracker PRIVATE "$<$<CONFIG:MinSizeRel>:-Oz;-DNDEBUG>")
+  if (MINGW)
+    target_link_options(climate-tracker PRIVATE "-Wl,--subsystem=windows")
+  endif()
+endif()
 
-target_compile_options(climate-tracker PRIVATE "-Wall" "-Wextra" "-Wpedantic")
-target_compile_options(climate-tracker PRIVATE "$<$<CONFIG:Debug>:-g3;-Og>")
-target_compile_options(climate-tracker PRIVATE "$<$<CONFIG:Release>:-O2;-DNDEBUG>")
-target_compile_options(climate-tracker PRIVATE "$<$<CONFIG:RelWithDebInfo>:-g3;-O2;-DNDEBUG>")
-target_compile_options(climate-tracker PRIVATE "$<$<CONFIG:MinSizeRel>:-Oz;-DNDEBUG>")
+#file(GET_RUNTIME_DEPENDENCIES
+#     DIRECTORIES /ucrt64/bin
+#     PRE_EXCLUDE_REGEXES api-ms-*
+#     POST_EXCLUDE_REGEXES .*system32/.*\\.dll
+#     RESOLVED_DEPENDENCIES_VAR DEPS
+#     EXECUTABLES $<TARGET_FILE:climate-tracker>)
+#message("${DEPS}")
 
 add_subdirectory(src)
 add_subdirectory(res)

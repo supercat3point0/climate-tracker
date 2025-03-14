@@ -67,7 +67,11 @@ static void activate(GtkApplication *app) {
   char *path = malloc(strlen(user_data_dir) + strlen(data_dir) + strlen(file) + 1);
   strcpy(path, user_data_dir);
   strcat(path, data_dir);
+ #ifdef _WIN32
+  mkdir(path);
+#else
   mkdir(path, 0700);
+#endif
   strcat(path, file);
   FILE *fp = fopen(path, "w");
   free(path);
