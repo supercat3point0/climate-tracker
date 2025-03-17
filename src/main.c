@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/stat.h>
 
 #include <glib.h>
+#include <glib/gstdio.h>
 #include <gtk/gtk.h>
 
 static GtkBuilder *build;
@@ -61,22 +61,13 @@ static void activate(GtkApplication *app) {
 
   calculate_footprint();
 
-  const char *user_data_dir = g_get_user_data_dir();
-  const char *data_dir = "/net.catech_software.climate_tracker";
-  const char *file = "/file.txt";
-  char *path = malloc(strlen(user_data_dir) + strlen(data_dir) + strlen(file) + 1);
-  strcpy(path, user_data_dir);
-  strcat(path, data_dir);
- #ifdef _WIN32
-  mkdir(path);
-#else
-  mkdir(path, 0700);
-#endif
-  strcat(path, file);
-  FILE *fp = fopen(path, "w");
+  const char *data_dir = g_get_user_data_dir();
+  char *dir = g_build_path("/", data_dir, "net.catech-software.climate-tracker", NULL);
+  g_mkdir(dir, 0700);
+  char *path = g_build_path("/", dir, "history.xml", NULL);
+  free(dir);
+  if (g_access(path, F_OK) != 0) g_close(g_creat(path, 600), NULL);
   free(path);
-  fprintf(fp, "Hello, World!\n");
-  fclose(fp);
 }
 
 static void shutdown(void) {
