@@ -22,12 +22,42 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/stat.h>
 
 #include <glib.h>
-#include <glib/gstdio.h>
 #include <gtk/gtk.h>
 
 static GtkBuilder *build;
+static FILE *fp;
+
+static ptrdiff_t fgetline(char **restrict lineptr, size_t *restrict n, FILE *restrict stream) {
+  char chunk[256];
+  size_t len = sizeof(chunk);
+  *lineptr = realloc(*lineptr, len);
+  (*lineptr)[0] = '\0';
+
+  while (fgets(chunk, sizeof(chunk), stream) != NULL) {
+    size_t chunk_len = strlen(chunk);
+    size_t line_len = strlen(*lineptr);
+    if (len - line_len < chunk_len + 1) {
+      len *= 2;
+      *lineptr = realloc(*lineptr, len);
+    }
+
+    memcpy(*lineptr + line_len, chunk, chunk_len);
+    line_len += chunk_len;
+    if ((*lineptr)[line_len - 1] == '\n') {
+      (*lineptr)[line_len - 1] = '\0';
+      len = strlen(*lineptr) + 1;
+      *lineptr = realloc(*lineptr, len);
+      if (n != NULL) *n = len;
+      return len - 1;
+    }
+    (*lineptr)[line_len] = '\0';
+  }
+
+  return -1;
+}
 
 G_MODULE_EXPORT void calculate_footprint(void) {
   double footprint = 0;
@@ -85,14 +115,24 @@ static void activate(GtkApplication *app) {
 
   const char *data_dir = g_get_user_data_dir();
   char *dir = g_build_path("/", data_dir, "net.catech-software.climate-tracker", NULL);
-  g_mkdir(dir, 0700);
-  char *path = g_build_path("/", dir, "history.xml", NULL);
+#if _WIN32
+  mkdir(dir);
+#else
+  mkdir(dir, 0700);
+#endif
+  char *path = g_build_path("/", dir, "history", NULL);
   free(dir);
-  if (g_access(path, F_OK) != 0) g_close(g_creat(path, 600), NULL);
+  fp = fopen(path, "a+");
   free(path);
+  rewind(fp);
+  char *str = NULL;
+  while (fgetline(&str, NULL, fp) != -1) printf("%s\n", str);
+  free(str);
+  fseek(fp, 0, SEEK_END);
 }
 
 static void shutdown(void) {
+  fclose(fp);
   g_object_unref(build);
 }
 
