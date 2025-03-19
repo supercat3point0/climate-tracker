@@ -191,6 +191,24 @@
             <property name="xalign">0</property>
           </object>
         </child>
+        <child>
+          <object class="GtkBox">
+            <property name="spacing">5</property>
+            <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
+            <child>
+              <object class="GtkButton">
+                <property name="label">Save</property>
+                <signal name="clicked" handler="save_to_history" />
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton">
+                <property name="label">Clear</property>
+                <signal name="clicked" handler="clear_history" />
+              </object>
+            </child>
+          </object>
+        </child>
       </object>
     </child>
   </object>

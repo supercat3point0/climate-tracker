@@ -23,12 +23,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#include <time.h>
+
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 
 #include <glib.h>
 #include <gtk/gtk.h>
 
 static GtkBuilder *build;
+static char *path;
 static FILE *fp;
+static double footprint = 0;
 
 static ptrdiff_t fgetline(char **restrict lineptr, size_t *restrict n, FILE *restrict stream) {
   char chunk[256];
@@ -60,7 +69,7 @@ static ptrdiff_t fgetline(char **restrict lineptr, size_t *restrict n, FILE *res
 }
 
 G_MODULE_EXPORT void calculate_footprint(void) {
-  double footprint = 0;
+  footprint = 0;
 
   // add 105lbs for every dollar spent on electricity
   GtkSpinButton *electric = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "electric"));
@@ -103,36 +112,58 @@ G_MODULE_EXPORT void calculate_footprint(void) {
   free(str);
 }
 
+G_MODULE_EXPORT void save_to_history(void) {
+  time_t current_time;
+  time(&current_time);
+  struct tm *date = localtime(&current_time);
+  char time_string[11];
+  strftime(time_string, sizeof(time_string), "%Y-%m-%d", date);
+
+  fprintf(fp, "%s: %g\n", time_string, footprint);
+  fflush(fp);
+#if _WIN32
+  _commit(_fileno(fp));
+#else
+  fsync(fileno(fp));
+#endif
+}
+
+G_MODULE_EXPORT void clear_history(void) {
+  fclose(fp);
+  remove(path);
+  fopen(path, "a+");
+}
+
 static void activate(GtkApplication *app) {
   build = gtk_builder_new_from_resource("/net/catech-software/climate-tracker/climate-tracker.ui");
 
   GtkApplicationWindow *window = GTK_APPLICATION_WINDOW(gtk_builder_get_object(build, "window"));
   gtk_window_set_application(GTK_WINDOW(window), app);
 
-  gtk_window_present(GTK_WINDOW(window));
-
   calculate_footprint();
 
   const char *data_dir = g_get_user_data_dir();
   char *dir = g_build_path("/", data_dir, "net.catech-software.climate-tracker", NULL);
 #if _WIN32
-  mkdir(dir);
+  _mkdir(dir);
 #else
   mkdir(dir, 0700);
 #endif
-  char *path = g_build_path("/", dir, "history", NULL);
+  path = g_build_path("/", dir, "history", NULL);
   free(dir);
   fp = fopen(path, "a+");
-  free(path);
   rewind(fp);
   char *str = NULL;
   while (fgetline(&str, NULL, fp) != -1) printf("%s\n", str);
   free(str);
   fseek(fp, 0, SEEK_END);
+
+  gtk_window_present(GTK_WINDOW(window));
 }
 
 static void shutdown(void) {
   fclose(fp);
+  free(path);
   g_object_unref(build);
 }
 
