@@ -25,12 +25,6 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#ifdef _WIN32
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
-
 #include <glib.h>
 #include <gtk/gtk.h>
 
@@ -38,6 +32,9 @@ static GtkBuilder *build;
 static char *path;
 static FILE *fp;
 static double footprint = 0;
+static GtkLabel **history;
+static size_t history_len = 16;
+static GtkBox *history_box;
 
 static ptrdiff_t fgetline(char **restrict lineptr, size_t *restrict n, FILE *restrict stream) {
   char chunk[256];
@@ -117,21 +114,29 @@ G_MODULE_EXPORT void save_to_history(void) {
   time(&current_time);
   struct tm *date = localtime(&current_time);
   char time_string[11];
+  // using this program after year 9999 is undefined behavior :)
   strftime(time_string, sizeof(time_string), "%Y-%m-%d", date);
 
-  fprintf(fp, "%s: %g\n", time_string, footprint);
+  history = realloc(history, ++history_len * sizeof(GtkLabel*));
+  char *str = malloc((snprintf(NULL, 0, "%s: %g", time_string, footprint) + 1) * sizeof(char));
+  sprintf(str, "%s: %g", time_string, footprint);
+  history[history_len - 1] = GTK_LABEL(gtk_label_new(str));
+  gtk_label_set_xalign(history[history_len - 1], 0);
+  gtk_box_append(history_box, GTK_WIDGET(history[history_len - 1]));
+
+  fprintf(fp, "%s\n", str);
+  free(str);
   fflush(fp);
-#if _WIN32
-  _commit(_fileno(fp));
-#else
-  fsync(fileno(fp));
-#endif
 }
 
 G_MODULE_EXPORT void clear_history(void) {
-  fclose(fp);
-  remove(path);
-  fopen(path, "a+");
+  for (size_t i = 0; i < history_len; i++) gtk_box_remove(history_box, GTK_WIDGET(history[i]));
+  history_len = 0;
+  free(history);
+  history = NULL; // ensure history can be realloc'd
+
+  // clear history
+  freopen(path, "w+", fp);
 }
 
 static void activate(GtkApplication *app) {
@@ -153,8 +158,21 @@ static void activate(GtkApplication *app) {
   free(dir);
   fp = fopen(path, "a+");
   rewind(fp);
+  history = malloc(history_len * sizeof(GtkLabel*));
+  size_t history_count = 0;
+  history_box = GTK_BOX(gtk_builder_get_object(build, "history"));
   char *str = NULL;
-  while (fgetline(&str, NULL, fp) != -1) printf("%s\n", str);
+  while (fgetline(&str, NULL, fp) != -1) {
+    if (++history_count > history_len) {
+      history_len *= 2;
+      history = realloc(history, history_len * sizeof(GtkLabel*));
+    }
+    history[history_count - 1] = GTK_LABEL(gtk_label_new(str));
+    gtk_label_set_xalign(history[history_count - 1], 0);
+    gtk_box_append(history_box, GTK_WIDGET(history[history_count - 1]));
+  }
+  history_len = history_count;
+  history = realloc(history, history_len * sizeof(GtkLabel*));
   free(str);
   fseek(fp, 0, SEEK_END);
 
@@ -162,6 +180,7 @@ static void activate(GtkApplication *app) {
 }
 
 static void shutdown(void) {
+  free(history);
   fclose(fp);
   free(path);
   g_object_unref(build);
