@@ -22,8 +22,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/stat.h>
 #include <time.h>
+
+#ifdef _WIN32
+#include <direct.h>
+#else
+#include <sys/stat.h>
+#endif
 
 #include <glib.h>
 #include <gtk/gtk.h>
